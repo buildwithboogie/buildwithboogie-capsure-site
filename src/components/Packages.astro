@@ -1,0 +1,63 @@
+---
+import Icon from './Icon.astro';
+import { packages as p } from '../content.js';
+---
+<section id="packages" class="section packages-section" aria-labelledby="packages-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Prices</p>
+      <h2 id="packages-title">{p.title}</h2>
+      <p>{p.intro}</p>
+    </div>
+
+    <ul class="packages">
+      {p.items.map((item) => (
+        <li class={`package reveal${item.highlight ? ' is-highlight' : ''}`}>
+          {item.badge && <span class="badge">{item.badge}</span>}
+          <h3>{item.name}</h3>
+          <p class="price"><span class="amount">{item.price}</span> <span class="period">{item.period}</span></p>
+          <p class="setup">{item.setup}</p>
+          <ul class="features">
+            {item.features.map((f) => <li><Icon name="check" size={18} />{f}</li>)}
+          </ul>
+          <a href="#get-audit" class={`btn ${item.highlight ? 'btn-primary' : 'btn-ghost'} package-cta`}>{item.cta}</a>
+        </li>
+      ))}
+    </ul>
+
+    <div class="packages-notes">
+      <p><strong>You own the software.</strong> {p.ownership}</p>
+      <p><strong>Terms.</strong> {p.terms}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .packages-section { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .packages { list-style: none; margin: 0; padding: 0; display: grid; gap: 20px; }
+  .package {
+    position: relative; display: flex; flex-direction: column;
+    padding: 32px 28px; border-radius: var(--radius);
+    background: var(--bg); border: 1px solid var(--line);
+  }
+  .package.is-highlight { border: 2px solid var(--accent); box-shadow: 0 0 0 6px var(--accent-soft); }
+  .badge {
+    position: absolute; top: -13px; left: 26px;
+    background: var(--accent); color: var(--accent-ink);
+    font-size: 13px; font-weight: 600; padding: 4px 12px; border-radius: 999px;
+  }
+  .price { margin-top: 18px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .amount { font-family: var(--font-display); font-weight: 800; font-size: 46px; letter-spacing: -0.03em; line-height: 1; }
+  .period { color: var(--muted); }
+  .setup { color: var(--muted); font-size: 15px; margin-top: 10px; min-height: 3em; }
+  .features { list-style: none; margin: 24px 0 28px; padding: 24px 0 0; border-top: 1px solid var(--line); display: grid; gap: 12px; font-size: 16px; }
+  .features li { display: flex; gap: 10px; align-items: flex-start; }
+  .features :global(svg) { color: var(--accent); flex: none; margin-top: 3px; }
+  .package-cta { margin-top: auto; width: 100%; }
+  .packages-notes { display: grid; gap: 12px; margin-top: 32px; color: var(--muted); max-width: 820px; }
+  .packages-notes strong { color: var(--text); }
+  @media (min-width: 980px) {
+    .packages { grid-template-columns: repeat(3, 1fr); align-items: stretch; }
+    .package h3 { min-height: 2.4em; }
+  }
+</style>

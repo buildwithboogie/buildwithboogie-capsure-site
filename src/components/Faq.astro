@@ -1,0 +1,37 @@
+---
+import Icon from './Icon.astro';
+import { faq } from '../content.js';
+---
+<section id="faq" class="section" aria-labelledby="faq-title">
+  <div class="wrap faq-wrap">
+    <div class="section-head">
+      <p class="eyebrow">FAQ</p>
+      <h2 id="faq-title">{faq.title}</h2>
+    </div>
+    <div class="faq-list">
+      {faq.items.map((item, i) => (
+        <details class="faq-item" open={i === 0}>
+          <summary><span>{item.q}</span><Icon name="plus" size={22} class="faq-toggle" /></summary>
+          <p>{item.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq-list { border-top: 1px solid var(--line); }
+  .faq-item { border-bottom: 1px solid var(--line); }
+  summary {
+    display: flex; justify-content: space-between; align-items: center; gap: 20px;
+    padding: 24px 0; cursor: pointer; list-style: none;
+    font-family: var(--font-display); font-weight: 800; font-size: clamp(20px, 2.6vw, 24px); letter-spacing: -0.015em; line-height: 1.25;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary :global(.faq-toggle) { flex: none; color: var(--accent); transition: transform .25s ease; }
+  details[open] summary :global(.faq-toggle) { transform: rotate(45deg); }
+  .faq-item p { color: var(--muted); padding: 0 0 26px; max-width: 46em; font-size: 17px; }
+  @media (min-width: 900px) {
+    .faq-wrap { display: grid; grid-template-columns: 1fr 1.6fr; gap: 64px; align-items: start; }
+  }
+</style>

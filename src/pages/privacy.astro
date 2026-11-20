@@ -1,0 +1,51 @@
+---
+import Legal from '../layouts/Legal.astro';
+import { contact } from '../content.js';
+import { ph } from '../lib/format.js';
+const email = ph(contact.email);
+---
+<Legal title="Privacy Policy" description="How Capsure collects, uses and protects personal data under UK GDPR." updated="[DATE]">
+  <h2>Who we are</h2>
+  <p set:html={`Capsure (“we”, “us”) is the controller of the personal data described in this policy when you use this website or contact us. You can reach us at ${email}.`} />
+  <p>When we work for a client business, we handle that business’s customer enquiries as a <strong>data processor</strong> on the client’s instructions, under a separate written data processing agreement. This policy covers our own website and enquiries only.</p>
+
+  <h2>What we collect</h2>
+  <ul>
+    <li><strong>Enquiry form:</strong> your name, company, email, phone number, trade, monthly lead spend range and anything you tell us about your enquiry handling.</li>
+    <li><strong>Call bookings:</strong> the details you give when booking through Cal.com (name, email and any notes).</li>
+    <li><strong>Emails and calls:</strong> what you send us or tell us when you get in touch.</li>
+    <li><strong>Technical data:</strong> our hosting provider keeps standard server logs (such as IP address and browser type) for security. If analytics is switched on, we use Plausible, which does not use cookies or collect personal data, and only after you accept.</li>
+  </ul>
+
+  <h2>Why we use it and our lawful basis</h2>
+  <ul>
+    <li>To reply to your enquiry and arrange a call or Leak Audit: <em>legitimate interests</em> (responding to a business enquiry you started), or steps before entering a <em>contract</em>.</li>
+    <li>To deliver services you’ve bought, invoice and keep accounts: <em>contract</em> and <em>legal obligation</em>.</li>
+    <li>To keep the website secure and understand how it’s used: <em>legitimate interests</em>, or <em>consent</em> for analytics.</li>
+  </ul>
+  <p>We do not sell your data, buy contact lists or send cold marketing. If we email you about our services, it will only be because you contacted us first, and you can opt out at any time.</p>
+
+  <h2>Who we share it with</h2>
+  <p>We use trusted providers to run the business. They act as our processors:</p>
+  <ul>
+    <li>Netlify (website hosting and form handling)</li>
+    <li>Cal.com (call booking)</li>
+    <li>[EMAIL PROVIDER, e.g. Google Workspace or Microsoft 365]</li>
+    <li>[ACCOUNTING / CRM SOFTWARE]</li>
+    <li>Plausible Analytics (only if analytics is switched on)</li>
+  </ul>
+  <p>Some providers may process data outside the UK (for example in the USA). Where they do, we rely on UK adequacy regulations (including the UK–US data bridge) or the UK International Data Transfer Agreement/Addendum.</p>
+
+  <h2>How long we keep it</h2>
+  <p>Enquiries that don’t become work: up to [24 months] after our last contact. Client records: for the length of our contract and then [6 years] for tax and legal purposes. We then delete or anonymise it.</p>
+
+  <h2>Your rights</h2>
+  <p set:html={`Under UK GDPR you can ask to access, correct, delete or restrict your data, object to how we use it, withdraw consent, and ask for a copy in a portable format. Email ${email}. We’ll reply within one month.`} />
+  <p>If you’re unhappy with how we’ve handled your data, you can complain to the Information Commissioner’s Office at <a href="https://ico.org.uk/make-a-complaint/" rel="noopener">ico.org.uk</a> or on 0303 123 1113. We’d appreciate the chance to put it right first.</p>
+
+  <h2>Cookies</h2>
+  <p>This website doesn’t use advertising or tracking cookies. If analytics is switched on, you’ll be asked first, and your choice is remembered in your browser’s storage. The Cal.com booking calendar may set its own cookies needed to make a booking.</p>
+
+  <h2>Changes</h2>
+  <p>We’ll update this page if anything changes. The date at the top shows the latest version.</p>
+</Legal>

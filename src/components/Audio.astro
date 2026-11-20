@@ -1,0 +1,45 @@
+---
+import Icon from './Icon.astro';
+import { audio } from '../content.js';
+import { ph } from '../lib/format.js';
+---
+<section id="listen" class="section listen-section" aria-labelledby="listen-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Hear it</p>
+      <h2 id="listen-title">{audio.title}</h2>
+      <p>{audio.intro}</p>
+    </div>
+    <div class="clips">
+      {audio.clips.map((clip, i) => (
+        <article class={`clip reveal${i === 0 ? ' is-good' : ' is-bad'}`} aria-labelledby={`clip-${i}`}>
+          <span class="clip-icon"><Icon name={i === 0 ? 'check' : 'phone'} /></span>
+          <h3 id={`clip-${i}`}>{clip.title}</h3>
+          <p class="clip-desc">{clip.description}</p>
+          <audio controls preload="metadata" src={clip.file} aria-label={clip.title}>
+            <a href={clip.file}>Download the recording</a>
+          </audio>
+          <details class="transcript">
+            <summary>Read the transcript</summary>
+            <p set:html={ph(clip.transcript)} />
+          </details>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .listen-section { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .clips { display: grid; gap: 20px; }
+  .clip { padding: 28px; border-radius: var(--radius); background: var(--bg); border: 1px solid var(--line); }
+  .clip-icon { display: inline-grid; place-items: center; width: 46px; height: 46px; border-radius: 12px; margin-bottom: 18px; }
+  .is-good .clip-icon { background: var(--accent-soft); color: var(--accent); }
+  .is-bad .clip-icon { background: rgba(255,138,122,.12); color: var(--danger); }
+  .clip-desc { color: var(--muted); margin-top: 8px; }
+  audio { width: 100%; margin-top: 22px; height: 48px; border-radius: 999px; }
+  .transcript { margin-top: 16px; font-size: 15px; }
+  .transcript summary { cursor: pointer; color: var(--text); font-weight: 500; padding: 6px 0; }
+  .transcript p { color: var(--muted); margin-top: 8px; }
+  @media (min-width: 900px) { .clips { grid-template-columns: 1fr 1fr; } }
+</style>

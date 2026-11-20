@@ -1,0 +1,43 @@
+---
+import { proof } from '../content.js';
+import { ph } from '../lib/format.js';
+---
+<section id="our-work" class="section" aria-labelledby="proof-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Proof</p>
+      <h2 id="proof-title">{proof.title}</h2>
+      <p>{proof.intro}</p>
+      {proof.placeholderNotice && <p class="notice"><mark class="ph">{proof.placeholderNotice}</mark></p>}
+    </div>
+    <ul class="cases">
+      {proof.cases.map((c) => (
+        <li class="case reveal">
+          <p class="case-client">{c.client}</p>
+          <h3 set:html={ph(c.business)} />
+          <dl>
+            <div><dt>Problem</dt><dd set:html={ph(c.problem)} /></div>
+            <div><dt>What we did</dt><dd set:html={ph(c.did)} /></div>
+          </dl>
+          <p class="case-result"><span>Result</span><strong set:html={ph(c.result)} /></p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .notice { font-size: 15px !important; }
+  .cases { list-style: none; margin: 0; padding: 0; display: grid; gap: 20px; }
+  .case { display: flex; flex-direction: column; padding: 28px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); }
+  .case-client { font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .case h3 { font-size: 20px; }
+  dl { margin: 20px 0 0; display: grid; gap: 14px; }
+  dt { font-size: 13px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+  dd { margin: 2px 0 0; }
+  .case-result { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--line); display: grid; gap: 2px; }
+  dl + .case-result { margin-top: 24px; }
+  .case-result span { font-size: 13px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+  .case-result strong { font-family: var(--font-display); font-size: 24px; letter-spacing: -0.02em; line-height: 1.2; }
+  @media (min-width: 900px) { .cases { grid-template-columns: repeat(3, 1fr); } }
+</style>

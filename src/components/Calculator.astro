@@ -1,0 +1,219 @@
+---
+// The Leak Calculator.
+// Formula: enquiries × % not followed up × close rate × average job value.
+// Starting values and slider ranges are set in content.js → calculator.
+import Icon from './Icon.astro';
+import { calculator as c } from '../content.js';
+
+const d = c.defaults;
+const gbp = (n: number) => '£' + Math.round(n).toLocaleString('en-GB');
+const lostMonth = d.enquiries * (d.missedRate / 100) * (d.closeRate / 100) * d.jobValue;
+
+const fields = [
+  { id: 'enquiries', label: 'Enquiries per month', hint: 'Calls, forms and messages', prefix: '', suffix: '', max: 10000 },
+  { id: 'jobValue', label: 'Average job value', hint: 'Typical order size', prefix: '£', suffix: '', max: 1000000 },
+  { id: 'closeRate', label: 'Close rate', hint: 'Enquiries that become jobs', prefix: '', suffix: '%', max: 100 },
+  { id: 'missedRate', label: 'Enquiries not followed up', hint: 'Missed, slow or never chased', prefix: '', suffix: '%', max: 100 },
+] as const;
+const pct = (id: keyof typeof d) => ((d[id] - c.limits[id].min) / (c.limits[id].max - c.limits[id].min)) * 100;
+---
+<section id="calculator" class="section calc-section" aria-labelledby="calc-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Leak calculator</p>
+      <h2 id="calc-title">{c.title}</h2>
+      <p>{c.intro}</p>
+    </div>
+
+    <div class="calc" data-calc data-fee={c.monthlyFeeForComparison}>
+      <form class="calc-inputs" onsubmit="return false" aria-label="Your numbers">
+        {fields.map((f) => (
+          <div class="calc-field">
+            <div class="calc-label-row">
+              <label for={`calc-${f.id}`}>
+                <span class="calc-label">{f.label}</span>
+                <span class="calc-hint">{f.hint}</span>
+              </label>
+              <div class="calc-number">
+                {f.prefix && <span aria-hidden="true">{f.prefix}</span>}
+                <input
+                  id={`calc-${f.id}`}
+                  type="number"
+                  inputmode="numeric"
+                  min="0"
+                  max={f.max}
+                  step="1"
+                  value={d[f.id]}
+                  data-num={f.id}
+                />
+                {f.suffix && <span aria-hidden="true">{f.suffix}</span>}
+              </div>
+            </div>
+            <input
+              type="range"
+              class="calc-range"
+              aria-label={`${f.label} slider`}
+              min={c.limits[f.id].min}
+              max={c.limits[f.id].max}
+              step={c.limits[f.id].step}
+              value={d[f.id]}
+              data-range={f.id}
+              style={`--pct:${pct(f.id)}%`}
+            />
+          </div>
+        ))}
+      </form>
+
+      <div class="calc-result" aria-live="polite" aria-atomic="true">
+        <p class="calc-result-label">Estimated revenue lost</p>
+        <p class="calc-month"><span data-out="month">{gbp(lostMonth)}</span><span class="per">/month</span></p>
+        <p class="calc-year"><span data-out="year">{gbp(lostMonth * 12)}</span> a year</p>
+        <dl class="calc-breakdown">
+          <div><dt>Jobs slipping away each month</dt><dd data-out="jobs">{(d.enquiries * (d.missedRate / 100) * (d.closeRate / 100)).toFixed(1)}</dd></div>
+        </dl>
+        <p class="calc-compare" data-out="compare"></p>
+        <a href="#get-audit" class="btn btn-primary calc-cta">{c.cta}<Icon name="arrow" /></a>
+        <p class="calc-formula">
+          <span data-out="formula">{d.enquiries} enquiries × {d.missedRate}% not followed up × {d.closeRate}% close rate × {gbp(d.jobValue)}</span>.
+          An estimate, not a promise. The audit measures your real figure.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-calc]');
+  if (root) {
+    const fee = Number(root.dataset.fee) || 0;
+    const gbp = (n: number) => '£' + Math.round(n).toLocaleString('en-GB');
+    const nums = Object.fromEntries(
+      [...root.querySelectorAll<HTMLInputElement>('[data-num]')].map((el) => [el.dataset.num!, el])
+    );
+    const ranges = Object.fromEntries(
+      [...root.querySelectorAll<HTMLInputElement>('[data-range]')].map((el) => [el.dataset.range!, el])
+    );
+    const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
+
+    const val = (k: string) => {
+      const n = parseFloat(nums[k].value);
+      const max = parseFloat(nums[k].max);
+      return Number.isFinite(n) ? Math.min(Math.max(n, 0), max) : 0;
+    };
+    const paint = (r: HTMLInputElement) => {
+      const p = ((+r.value - +r.min) / (+r.max - +r.min)) * 100;
+      r.style.setProperty('--pct', Math.min(Math.max(p, 0), 100) + '%');
+    };
+
+    const update = () => {
+      const e = val('enquiries'), j = val('jobValue'), cr = val('closeRate') / 100, m = val('missedRate') / 100;
+      const jobs = e * m * cr;
+      const month = jobs * j;
+      out('month').textContent = gbp(month);
+      out('year').textContent = gbp(month * 12);
+      out('jobs').textContent = jobs.toFixed(1);
+      out('formula').textContent =
+        `${e.toLocaleString('en-GB')} enquiries × ${Math.round(m * 100)}% not followed up × ${Math.round(cr * 100)}% close rate × ${gbp(j)}`;
+      const compare = out('compare');
+      if (fee && j > 0 && jobs >= 1) {
+        const n = Math.max(1, Math.ceil(fee / j));
+        compare.textContent =
+          `Win back ${n === 1 ? 'just one of those jobs' : n + ' of those jobs'} a month and that’s ${gbp(n * j)} in, against a ${gbp(fee)} monthly fee.`;
+        compare.hidden = false;
+      } else {
+        compare.hidden = true;
+      }
+    };
+
+    for (const k of Object.keys(nums)) {
+      nums[k].addEventListener('input', () => {
+        ranges[k].value = String(val(k));
+        paint(ranges[k]);
+        update();
+      });
+      ranges[k].addEventListener('input', () => {
+        nums[k].value = ranges[k].value;
+        paint(ranges[k]);
+        update();
+      });
+    }
+    update();
+  }
+</script>
+
+<style>
+  .calc-section { background: linear-gradient(180deg, var(--bg), var(--surface) 70%); }
+  .calc { display: grid; gap: 20px; }
+  .calc-inputs, .calc-result {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: clamp(20px, 4vw, 36px);
+  }
+  .calc-inputs { display: grid; gap: 28px; }
+  .calc-label-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .calc-label { display: block; font-weight: 600; }
+  .calc-hint { display: block; color: var(--muted); font-size: 14px; }
+  .calc-number {
+    display: flex; align-items: center; gap: 2px; flex: none;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+    padding: 0 12px; height: 48px;
+    font-family: var(--font-display); font-weight: 800; font-size: 20px;
+  }
+  .calc-number:focus-within { border-color: var(--accent); }
+  .calc-number input {
+    width: 5.2ch; border: 0; background: transparent; text-align: right;
+    font: inherit; padding: 0; -moz-appearance: textfield; appearance: textfield;
+  }
+  .calc-number input:focus { outline: none; }
+  .calc-number input::-webkit-outer-spin-button,
+  .calc-number input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  [data-num="jobValue"] { width: 6.4ch !important; }
+
+  .calc-range {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 36px; margin: 10px 0 0; background: transparent; cursor: pointer;
+  }
+  .calc-range::-webkit-slider-runnable-track {
+    height: 6px; border-radius: 3px;
+    background: linear-gradient(to right, var(--accent) var(--pct), var(--line) var(--pct));
+  }
+  .calc-range::-moz-range-track { height: 6px; border-radius: 3px; background: var(--line); }
+  .calc-range::-moz-range-progress { height: 6px; border-radius: 3px; background: var(--accent); }
+  .calc-range::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 28px; height: 28px; margin-top: -11px;
+    border-radius: 50%; background: var(--text); border: 6px solid var(--accent);
+    box-shadow: 0 2px 10px rgba(0,0,0,.4);
+  }
+  .calc-range::-moz-range-thumb {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--text); border: 6px solid var(--accent);
+  }
+  .calc-range:focus-visible { outline: none; }
+  .calc-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(61,220,151,.4); }
+  .calc-range:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px rgba(61,220,151,.4); }
+
+  .calc-result { border-color: rgba(61,220,151,.35); background: linear-gradient(160deg, #13261f, var(--surface-2) 60%); }
+  .calc-result-label { color: var(--muted); font-weight: 500; }
+  .calc-month {
+    font-family: var(--font-display); font-weight: 800; letter-spacing: -0.035em; line-height: 1;
+    font-size: clamp(48px, 9vw, 76px); color: var(--accent); margin-top: 8px;
+    font-variant-numeric: tabular-nums; overflow-wrap: anywhere;
+  }
+  .per { font-size: .36em; letter-spacing: 0; color: var(--muted); margin-left: 6px; }
+  .calc-year { font-size: 20px; margin-top: 10px; }
+  .calc-year span { font-weight: 600; }
+  .calc-breakdown { margin: 24px 0 0; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .calc-breakdown div { display: flex; justify-content: space-between; gap: 16px; }
+  .calc-breakdown dt { color: var(--muted); }
+  .calc-breakdown dd { margin: 0; font-weight: 600; }
+  .calc-compare { margin-top: 18px; }
+  .calc-compare[hidden] { display: none; }
+  .calc-cta { width: 100%; margin-top: 24px; }
+  .calc-formula { margin-top: 16px; font-size: 14px; color: var(--muted); }
+
+  @media (min-width: 900px) {
+    .calc { grid-template-columns: 1.1fr 1fr; gap: 24px; align-items: start; }
+    .calc-result { position: sticky; top: 96px; }
+  }
+</style>

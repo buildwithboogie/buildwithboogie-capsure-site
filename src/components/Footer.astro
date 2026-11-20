@@ -1,0 +1,52 @@
+---
+import Wordmark from './Wordmark.astro';
+import { site, contact } from '../content.js';
+import { ph, isSet, telHref } from '../lib/format.js';
+const { analyticsOn = false } = Astro.props;
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div>
+        <Wordmark size={26} />
+        <p class="footer-tagline">{site.tagline}</p>
+        <p class="footer-place">Based in {contact.town}, {contact.county}. Working across Surrey, Sussex and the South East.</p>
+      </div>
+      <ul class="footer-contact">
+        <li>
+          {isSet(contact.email)
+            ? <a href={`mailto:${contact.email}`}>{contact.email}</a>
+            : <span set:html={ph(contact.email)} />}
+        </li>
+        <li>
+          {isSet(contact.phone)
+            ? <a href={telHref(contact.phone)}>{contact.phone}</a>
+            : <span set:html={ph(contact.phone)} />}
+        </li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <p class="legal" set:html={`© ${year} ${ph(contact.legalLine)}`} />
+      <ul class="footer-links">
+        <li><a href="/privacy/">Privacy Policy</a></li>
+        <li><a href="/terms/">Terms</a></li>
+        {analyticsOn && <li><a href="#" data-cookie-settings>Cookie settings</a></li>}
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer { border-top: 1px solid var(--line); padding: 56px 0 40px; font-size: 15px; color: var(--muted); }
+  .footer-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 32px; }
+  .footer-tagline { color: var(--text); font-weight: 500; margin-top: 16px; }
+  .footer-place { margin-top: 6px; max-width: 34em; }
+  .footer-contact, .footer-links { list-style: none; margin: 0; padding: 0; }
+  .footer-contact { display: grid; gap: 8px; align-content: start; }
+  .footer-contact a, .footer-links a { color: var(--text); text-decoration: none; display: inline-block; padding: 4px 0; }
+  .footer-contact a:hover, .footer-links a:hover { text-decoration: underline; }
+  .footer-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px 32px; margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line); }
+  .legal { max-width: 52em; font-size: 14px; }
+  .footer-links { display: flex; gap: 24px; }
+</style>

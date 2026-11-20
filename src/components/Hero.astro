@@ -1,0 +1,54 @@
+---
+import Icon from './Icon.astro';
+import { hero, evidence } from '../content.js';
+import { ph } from '../lib/format.js';
+---
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap">
+    <p class="eyebrow">{hero.eyebrow}</p>
+    <h1 id="hero-title">{hero.headline}</h1>
+    <p class="hero-sub">{hero.subhead}</p>
+    <div class="hero-actions">
+      <a href="#get-audit" class="btn btn-primary btn-lg" id="hero-cta">{hero.cta}<Icon name="arrow" /></a>
+      <a href="#calculator" class="btn btn-ghost btn-lg">{hero.secondaryCta}</a>
+    </div>
+  </div>
+</section>
+
+<section class="evidence" aria-labelledby="evidence-title">
+  <div class="wrap">
+    <h2 id="evidence-title" class="evidence-intro" set:html={ph(evidence.intro)} />
+    <ul class="evidence-grid">
+      {evidence.stats.map((s) => (
+        <li class="evidence-item reveal">
+          <span class="evidence-figure" set:html={ph(s.figure)} />
+          <span class="evidence-label" set:html={ph(s.label)} />
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .hero { padding: clamp(56px, 10vw, 120px) 0 clamp(56px, 8vw, 96px); position: relative; overflow: hidden; }
+  .hero::before {
+    /* faint "target ring" behind the headline, echoing the wordmark */
+    content: ''; position: absolute; right: -180px; top: -160px;
+    width: 560px; height: 560px; border-radius: 50%;
+    border: 70px solid rgba(61, 220, 151, 0.05);
+    pointer-events: none;
+  }
+  h1 { font-size: clamp(42px, 8.4vw, 92px); max-width: 13ch; letter-spacing: -0.035em; }
+  .hero-sub { font-size: clamp(18px, 2.2vw, 21px); color: var(--muted); max-width: 40em; margin-top: 24px; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
+  .btn-lg { min-height: 58px; padding: 16px 26px; font-size: 17px; }
+  @media (max-width: 520px) { .hero-actions .btn { width: 100%; } }
+
+  .evidence { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--surface); padding: clamp(40px, 6vw, 64px) 0; }
+  .evidence-intro { font-family: var(--font-body); font-size: 15px; font-weight: 500; letter-spacing: 0; color: var(--muted); line-height: 1.5; max-width: 46em; }
+  .evidence-grid { list-style: none; margin: 28px 0 0; padding: 0; display: grid; gap: 28px; }
+  .evidence-item { display: grid; gap: 6px; padding-left: 18px; border-left: 3px solid var(--accent); }
+  .evidence-figure { font-family: var(--font-display); font-weight: 800; font-size: clamp(36px, 5vw, 48px); letter-spacing: -0.03em; line-height: 1.05; }
+  .evidence-label { color: var(--muted); max-width: 22em; }
+  @media (min-width: 820px) { .evidence-grid { grid-template-columns: repeat(3, 1fr); gap: 40px; } }
+</style>

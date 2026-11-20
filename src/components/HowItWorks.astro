@@ -1,0 +1,80 @@
+---
+import Icon from './Icon.astro';
+import { howItWorks as h } from '../content.js';
+const stepIcons = ['search', 'wrench', 'pound'];
+const flowIcons = ['phone', 'message', 'repeat', 'calendar'];
+---
+<section id="how-it-works" class="section" aria-labelledby="how-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Three steps</p>
+      <h2 id="how-title">{h.title}</h2>
+    </div>
+
+    <ol class="steps">
+      {h.steps.map((s, i) => (
+        <li class="step reveal">
+          <span class="step-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <span class="step-icon"><Icon name={stepIcons[i] ?? 'check'} /></span>
+          <h3>{s.name}</h3>
+          <p>{s.text}</p>
+        </li>
+      ))}
+    </ol>
+
+    <figure class="flow reveal">
+      <figcaption class="sr-only">How an enquiry becomes a booked job: {h.flow.map((f) => f.name).join(', then ')}.</figcaption>
+      <ol class="flow-list">
+        {h.flow.map((f, i) => (
+          <li class={`flow-node${i === h.flow.length - 1 ? ' is-final' : ''}`}>
+            <span class="flow-icon"><Icon name={i === h.flow.length - 1 ? 'check' : flowIcons[i]} /></span>
+            <span class="flow-text">
+              <strong>{f.name}</strong>
+              <span>{f.detail}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+  .step {
+    position: relative; padding: 28px; border-radius: var(--radius);
+    background: var(--surface); border: 1px solid var(--line);
+  }
+  .step-num { position: absolute; top: 24px; right: 26px; font-family: var(--font-display); font-weight: 800; color: var(--line); font-size: 28px; }
+  .step-icon { display: inline-grid; place-items: center; width: 46px; height: 46px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); margin-bottom: 20px; }
+  .step p { color: var(--muted); margin-top: 8px; }
+
+  .flow { margin: 48px 0 0; }
+  .flow-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+  .flow-node { position: relative; display: flex; gap: 16px; align-items: flex-start; padding: 0 0 28px; }
+  .flow-node::before {
+    content: ''; position: absolute; left: 23px; top: 48px; bottom: 0; width: 2px;
+    background: repeating-linear-gradient(to bottom, var(--accent) 0 6px, transparent 6px 12px);
+    opacity: .6;
+  }
+  .flow-node:last-child { padding-bottom: 0; }
+  .flow-node:last-child::before { display: none; }
+  .flow-icon {
+    flex: none; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%;
+    border: 2px solid var(--accent); color: var(--accent); background: var(--bg);
+  }
+  .is-final .flow-icon { background: var(--accent); color: var(--accent-ink); }
+  .flow-text { display: grid; padding-top: 4px; }
+  .flow-text strong { font-family: var(--font-display); font-size: 20px; letter-spacing: -0.01em; }
+  .flow-text span { color: var(--muted); font-size: 15px; }
+
+  @media (min-width: 820px) {
+    .steps { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .flow-list { grid-template-columns: repeat(4, 1fr); }
+    .flow-node { flex-direction: column; padding: 0 20px 0 0; }
+    .flow-node::before {
+      left: 56px; right: 8px; top: 23px; bottom: auto; width: auto; height: 2px;
+      background: repeating-linear-gradient(to right, var(--accent) 0 6px, transparent 6px 12px);
+    }
+  }
+</style>

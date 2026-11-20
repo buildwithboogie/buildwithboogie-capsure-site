@@ -1,0 +1,80 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import Calculator from '../components/Calculator.astro';
+import HowItWorks from '../components/HowItWorks.astro';
+import Packages from '../components/Packages.astro';
+import Proof from '../components/Proof.astro';
+import Audio from '../components/Audio.astro';
+import Faq from '../components/Faq.astro';
+import FinalCta from '../components/FinalCta.astro';
+import StickyCta from '../components/StickyCta.astro';
+import { site, contact, packages, faq } from '../content.js';
+import { isSet } from '../lib/format.js';
+
+const url = Astro.site!.href;
+const price = (s: string) => s.replace(/[^\d.]/g, '');
+
+// Structured data for Google (LocalBusiness + Services + FAQ)
+const business: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  '@id': url + '#business',
+  name: site.name,
+  slogan: site.tagline,
+  description: site.seoDescription,
+  url,
+  image: new URL(site.ogImage, url).href,
+  logo: new URL('/apple-touch-icon.png', url).href,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: contact.town,
+    addressRegion: contact.county,
+    addressCountry: contact.country,
+  },
+  areaServed: [
+    { '@type': 'AdministrativeArea', name: 'Surrey' },
+    { '@type': 'AdministrativeArea', name: 'West Sussex' },
+    { '@type': 'AdministrativeArea', name: 'East Sussex' },
+    { '@type': 'AdministrativeArea', name: 'South East England' },
+  ],
+  priceRange: '£750–£2,950',
+  makesOffer: packages.items.map((p) => ({
+    '@type': 'Offer',
+    price: price(p.price),
+    priceCurrency: 'GBP',
+    description: `${p.price} ${p.period}. ${p.setup}`,
+    itemOffered: {
+      '@type': 'Service',
+      name: p.name,
+      serviceType: 'Enquiry response and quote follow-up for home-improvement companies',
+      provider: { '@id': url + '#business' },
+      areaServed: 'Surrey, Sussex and South East England',
+      description: p.features.join('; '),
+    },
+  })),
+};
+if (isSet(contact.email)) business.email = contact.email;
+if (isSet(contact.phone)) business.telephone = contact.phone;
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.items.map((i) => ({
+    '@type': 'Question',
+    name: i.q,
+    acceptedAnswer: { '@type': 'Answer', text: i.a },
+  })),
+};
+---
+<Base schema={[business, faqSchema]}>
+  <Hero />
+  <Calculator />
+  <HowItWorks />
+  <Packages />
+  <Proof />
+  <Audio />
+  <Faq />
+  <FinalCta />
+  <StickyCta />
+</Base>

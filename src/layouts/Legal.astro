@@ -1,0 +1,39 @@
+---
+import Base from './Base.astro';
+import { contact } from '../content.js';
+import { ph } from '../lib/format.js';
+interface Props { title: string; description: string; updated: string }
+const { title, description, updated } = Astro.props;
+// Highlight any remaining [PLACEHOLDERS] in the legal text.
+const body = (await Astro.slots.render('default')).replace(
+  /(?<!<mark class="ph">)\[[^\]<]+\]/g,
+  (m) => `<mark class="ph">${m}</mark>`
+);
+---
+<Base title={`${title} | Capsure`} description={description}>
+  <article class="section legal-page">
+    <div class="wrap legal-wrap">
+      <p class="review-flag" role="note">
+        <strong>DRAFT FOR REVIEW.</strong> This is UK GDPR starter text, not legal advice. Check it against how you actually work and have it reviewed before relying on it.
+      </p>
+      <h1>{title}</h1>
+      <p class="updated" set:html={`Last updated: ${ph(updated)}`} />
+      <p class="entity" set:html={ph(contact.legalLine)} />
+      <div class="legal-body" set:html={body} />
+    </div>
+  </article>
+</Base>
+
+<style>
+  .legal-wrap { max-width: 760px; }
+  .review-flag { background: rgba(255,216,77,.12); border: 1px solid rgba(255,216,77,.5); color: #ffe58a; padding: 14px 16px; border-radius: 10px; font-size: 15px; margin-bottom: 32px; }
+  h1 { font-size: clamp(36px, 6vw, 56px); }
+  .updated { color: var(--muted); margin-top: 12px; }
+  .entity { color: var(--muted); margin-top: 4px; font-size: 15px; }
+  .legal-body { margin-top: 40px; }
+  .legal-body :global(h2) { font-size: 24px; letter-spacing: -0.015em; margin: 40px 0 12px; }
+  .legal-body :global(p), .legal-body :global(li) { color: #d6d7d3; }
+  .legal-body :global(p + p) { margin-top: 12px; }
+  .legal-body :global(ul) { padding-left: 22px; margin: 12px 0; display: grid; gap: 8px; }
+  .legal-body :global(a) { color: var(--accent); }
+</style>

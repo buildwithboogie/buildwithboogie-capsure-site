@@ -1,0 +1,14 @@
+---
+// Shown only if someone sends the form with JavaScript switched off.
+import Base from '../layouts/Base.astro';
+import { finalCta } from '../content.js';
+---
+<Base title="Thanks | Capsure" noindex>
+  <section class="section">
+    <div class="wrap" style="max-width:720px">
+      <h1 style="font-size:clamp(36px,6vw,56px)">{finalCta.thankYouTitle}</h1>
+      <p style="color:var(--muted);margin-top:20px;font-size:18px">{finalCta.thankYouText}</p>
+      <p style="margin-top:32px"><a class="btn btn-ghost" href="/">Back to the homepage</a></p>
+    </div>
+  </section>
+</Base>

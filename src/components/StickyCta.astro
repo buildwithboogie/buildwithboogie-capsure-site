@@ -1,0 +1,46 @@
+---
+// Mobile-only bar pinned to the bottom of the screen.
+// Appears once the hero button scrolls away; hides at the enquiry form.
+import Icon from './Icon.astro';
+import { stickyCta } from '../content.js';
+---
+<div class="sticky-cta" data-sticky aria-hidden="true">
+  <a href="#get-audit" class="btn btn-primary" tabindex="-1">{stickyCta} · £750<Icon name="arrow" /></a>
+</div>
+
+<script>
+  const bar = document.querySelector<HTMLElement>('[data-sticky]');
+  const hero = document.getElementById('hero-cta');
+  const target = document.getElementById('get-audit');
+  if (bar && hero && target && 'IntersectionObserver' in window) {
+    const link = bar.querySelector('a')!;
+    let pastHero = false, atForm = false;
+    const sync = () => {
+      const show = pastHero && !atForm;
+      bar.classList.toggle('is-visible', show);
+      bar.setAttribute('aria-hidden', String(!show));
+      link.tabIndex = show ? 0 : -1;
+    };
+    new IntersectionObserver(([e]) => {
+      pastHero = !e.isIntersecting && e.boundingClientRect.top < 0;
+      sync();
+    }).observe(hero);
+    new IntersectionObserver(([e]) => { atForm = e.isIntersecting; sync(); }, { rootMargin: '0px 0px -30% 0px' }).observe(target);
+  }
+</script>
+
+<style>
+  .sticky-cta {
+    position: fixed; z-index: 40; left: 0; right: 0; bottom: 0;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: rgba(14, 17, 22, 0.92);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid var(--line);
+    transform: translateY(110%);
+    transition: transform .3s ease;
+  }
+  .sticky-cta.is-visible { transform: none; }
+  .sticky-cta .btn { width: 100%; min-height: 52px; }
+  @media (min-width: 900px) { .sticky-cta { display: none; } }
+  @media (max-width: 899px) { :global(.site-footer) { padding-bottom: 110px !important; } }
+</style>

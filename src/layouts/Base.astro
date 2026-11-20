@@ -1,0 +1,141 @@
+---
+// Page shell: <head>, SEO tags, fonts, header, footer, analytics slot.
+import '@fontsource/archivo/latin-800.css';
+import '@fontsource/inter/latin-400.css';
+import '@fontsource/inter/latin-500.css';
+import '@fontsource/inter/latin-600.css';
+import '../styles/global.css';
+import archivo800 from '@fontsource/archivo/files/archivo-latin-800-normal.woff2?url';
+import inter400 from '@fontsource/inter/files/inter-latin-400-normal.woff2?url';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site, analytics } from '../content.js';
+
+interface Props {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+  schema?: object[];
+}
+const { title = site.seoTitle, description = site.seoDescription, noindex = false, schema = [] } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL(site.ogImage, Astro.site).href;
+const analyticsOn = Boolean(analytics.plausibleDomain);
+---
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta name="theme-color" content="#0e1116" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preload" href={archivo800} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={inter400} as="font" type="font/woff2" crossorigin />
+
+    <!-- Social sharing (WhatsApp, LinkedIn, Facebook, X) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${site.name}: ${site.tagline}`} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {schema.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
+
+    <script is:inline>document.documentElement.classList.add('js');</script>
+
+    <!--
+      ANALYTICS SLOT (Plausible)
+      Switched on from content.js → analytics.plausibleDomain.
+      When on, the consent banner at the bottom of this file appears and
+      the Plausible script only loads after the visitor clicks "Accept".
+    -->
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer analyticsOn={analyticsOn} />
+
+    {analyticsOn && (
+      <div class="consent" id="consent" role="region" aria-label="Cookie consent" hidden>
+        <p>We’d like to use privacy-friendly analytics to see which parts of this page are useful. No advertising, no tracking across sites. <a href="/privacy/">Privacy Policy</a></p>
+        <div class="consent-actions">
+          <button class="btn btn-ghost" type="button" data-consent="no">No thanks</button>
+          <button class="btn btn-primary" type="button" data-consent="yes">Accept</button>
+        </div>
+      </div>
+      <script is:inline define:vars={{ domain: analytics.plausibleDomain }}>
+        (function () {
+          var KEY = 'capsure-consent';
+          var banner = document.getElementById('consent');
+          function get() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
+          function set(v) { try { localStorage.setItem(KEY, v); } catch (e) {} }
+          function load() {
+            if (document.getElementById('plausible')) return;
+            var s = document.createElement('script');
+            s.id = 'plausible'; s.defer = true;
+            s.setAttribute('data-domain', domain);
+            s.src = 'https://plausible.io/js/script.js';
+            document.head.appendChild(s);
+          }
+          var choice = get();
+          if (choice === 'yes') load();
+          else if (choice !== 'no') banner.hidden = false;
+          banner.addEventListener('click', function (e) {
+            var b = e.target.closest('[data-consent]');
+            if (!b) return;
+            set(b.dataset.consent);
+            banner.hidden = true;
+            if (b.dataset.consent === 'yes') load();
+          });
+          document.addEventListener('click', function (e) {
+            if (e.target.closest('[data-cookie-settings]')) { e.preventDefault(); banner.hidden = false; }
+          });
+        })();
+      </script>
+    )}
+
+    <script>
+      // Gentle fade-in for sections as they scroll into view.
+      const els = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver(
+          (entries) => entries.forEach((e) => {
+            if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); }
+          }),
+          { rootMargin: '0px 0px -8% 0px' }
+        );
+        els.forEach((el) => io.observe(el));
+      } else {
+        els.forEach((el) => el.classList.add('is-visible'));
+      }
+    </script>
+
+    <style is:global>
+      .consent {
+        position: fixed; z-index: 60; left: 12px; right: 12px; bottom: 12px;
+        max-width: 560px; margin: 0 auto;
+        background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius);
+        padding: 18px; box-shadow: 0 20px 50px rgba(0,0,0,.5);
+        font-size: 15px; color: var(--muted);
+      }
+      .consent[hidden] { display: none; }
+      .consent a { color: var(--text); }
+      .consent-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+      .consent .btn { min-height: 44px; padding: 10px 18px; }
+    </style>
+  </body>
+</html>
