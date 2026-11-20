@@ -1,6 +1,6 @@
 # Capsure website
 
-Live site: https://capsure.netlify.app (deploys automatically from the `main` branch)
+Live site: https://capsure.netlify.app (every change pushed to the `main` branch goes live automatically in about a minute)
 
 A one-page marketing site for Capsure, plus Privacy and Terms pages.
 Built with Astro, which turns these files into a plain, fast website. It's hosted free on Netlify.
