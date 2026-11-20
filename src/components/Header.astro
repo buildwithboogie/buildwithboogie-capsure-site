@@ -1,5 +1,9 @@
 ---
 import Wordmark from './Wordmark.astro';
+import Icon from './Icon.astro';
+import { contact } from '../content.js';
+import { isSet, telHref } from '../lib/format.js';
+const phoneSet = isSet(contact.phone);
 const links = [
   { href: '/#calculator', label: 'Calculator' },
   { href: '/#how-it-works', label: 'How it works' },
@@ -15,9 +19,12 @@ const links = [
         {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
       </ul>
     </nav>
+    <div class="header-actions">
+    {phoneSet && <a href={telHref(contact.phone)} class="call" aria-label={`Call us on ${contact.phone}`}><Icon name="phone" size={20} /></a>}
     <a href="/#get-audit" class="btn btn-primary header-cta">
       <span class="long">Get your Leak Audit</span><span class="short">Leak Audit</span>
     </a>
+    </div>
   </div>
 </header>
 
@@ -35,6 +42,8 @@ const links = [
   nav ul { display: flex; gap: 28px; list-style: none; margin: 0; padding: 0; }
   nav a { color: var(--muted); text-decoration: none; font-size: 15px; font-weight: 500; }
   nav a:hover { color: var(--text); }
+  .header-actions { display: flex; align-items: center; gap: 10px; }
+  .call { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--line); color: var(--accent); }
   .header-cta { min-height: 44px; padding: 10px 16px; font-size: 15px; }
   .header-cta .long { display: none; }
   @media (min-width: 900px) {

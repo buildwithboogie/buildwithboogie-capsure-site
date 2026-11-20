@@ -2,16 +2,37 @@
 import Icon from './Icon.astro';
 import { hero, evidence } from '../content.js';
 import { ph } from '../lib/format.js';
+const stateIcon: Record<string, string> = { missed: 'phone', sent: 'message', booked: 'check' };
 ---
 <section class="hero" aria-labelledby="hero-title">
-  <div class="wrap">
-    <p class="eyebrow">{hero.eyebrow}</p>
-    <h1 id="hero-title">{hero.headline}</h1>
-    <p class="hero-sub">{hero.subhead}</p>
-    <div class="hero-actions">
-      <a href="#get-audit" class="btn btn-primary btn-lg" id="hero-cta">{hero.cta}<Icon name="arrow" /></a>
-      <a href="#calculator" class="btn btn-ghost btn-lg">{hero.secondaryCta}</a>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">{hero.eyebrow}</p>
+      <h1 id="hero-title">{hero.headline}</h1>
+      <p class="hero-sub">{hero.subhead}</p>
+      <div class="hero-actions">
+        <a href="#get-audit" class="btn btn-primary btn-lg" id="hero-cta">{hero.cta}<Icon name="arrow" /></a>
+        <a href="#calculator" class="text-link">{hero.secondaryCta}<Icon name="arrow" size={18} /></a>
+      </div>
+      <ul class="hero-trust">
+        {hero.trust.map((t) => <li><Icon name="check" size={18} />{t}</li>)}
+      </ul>
     </div>
+
+    <figure class="hero-visual">
+      <ol class="feed">
+        {hero.visual.items.map((item, i) => (
+          <li class={`feed-item is-${item.state}`} style={`--d:${0.25 + i * 0.55}s`}>
+            <span class="feed-icon"><Icon name={stateIcon[item.state] ?? 'check'} size={20} /></span>
+            <span class="feed-body">
+              <span class="feed-top"><strong>{item.title}</strong><time>{item.time}</time></span>
+              <span class="feed-text">{item.text}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+      <figcaption>{hero.visual.caption} <span>(example)</span></figcaption>
+    </figure>
   </div>
 </section>
 
@@ -30,19 +51,59 @@ import { ph } from '../lib/format.js';
 </section>
 
 <style>
-  .hero { padding: clamp(56px, 10vw, 120px) 0 clamp(56px, 8vw, 96px); position: relative; overflow: hidden; }
+  .hero { padding: clamp(48px, 9vw, 112px) 0 clamp(56px, 8vw, 96px); position: relative; overflow: hidden; }
   .hero::before {
-    /* faint "target ring" behind the headline, echoing the wordmark */
+    /* faint "target ring", echoing the wordmark */
     content: ''; position: absolute; right: -180px; top: -160px;
     width: 560px; height: 560px; border-radius: 50%;
     border: 70px solid rgba(61, 220, 151, 0.05);
     pointer-events: none;
   }
-  h1 { font-size: clamp(42px, 8.4vw, 92px); max-width: 13ch; letter-spacing: -0.035em; }
-  .hero-sub { font-size: clamp(18px, 2.2vw, 21px); color: var(--muted); max-width: 40em; margin-top: 24px; }
-  .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
+  .hero-grid { display: grid; gap: 48px; position: relative; }
+  h1 { font-size: clamp(42px, 8.4vw, 84px); max-width: 13ch; letter-spacing: -0.035em; }
+  .hero-sub { font-size: clamp(18px, 2.2vw, 21px); color: var(--muted); max-width: 36em; margin-top: 24px; }
+  .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 28px; margin-top: 32px; }
+  .text-link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-weight: 600; color: var(--text); text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 6px; text-decoration-thickness: 2px; }
+  .text-link:hover { color: var(--accent); }
+  .text-link :global(svg) { color: var(--accent); }
   .btn-lg { min-height: 58px; padding: 16px 26px; font-size: 17px; }
-  @media (max-width: 520px) { .hero-actions .btn { width: 100%; } }
+  .hero-trust { list-style: none; margin: 24px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px 22px; font-size: 15px; color: var(--muted); }
+  .hero-trust li { display: flex; align-items: center; gap: 8px; }
+  .hero-trust :global(svg) { color: var(--accent); flex: none; }
+  @media (max-width: 520px) { .hero-actions .btn { width: 100%; } .text-link { margin: 0 auto; } }
+
+  /* Illustration: an evening enquiry becoming a booking */
+  .hero-visual { margin: 0; align-self: center; }
+  .feed { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; position: relative; }
+  .feed::before {
+    content: ''; position: absolute; left: 33px; top: 30px; bottom: 30px; width: 2px;
+    background: repeating-linear-gradient(to bottom, var(--line) 0 5px, transparent 5px 10px);
+  }
+  .feed-item {
+    position: relative; display: flex; gap: 14px; align-items: flex-start;
+    padding: 16px 18px; border-radius: var(--radius);
+    background: var(--surface); border: 1px solid var(--line);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+    animation: feed-in .6s ease both; animation-delay: var(--d);
+  }
+  .feed-icon { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; }
+  .is-missed .feed-icon { background: rgba(255, 138, 122, .14); color: var(--danger); }
+  .is-sent .feed-icon { background: var(--accent-soft); color: var(--accent); }
+  .is-booked { border-color: rgba(61, 220, 151, .5); background: linear-gradient(160deg, #13261f, var(--surface) 70%); }
+  .is-booked .feed-icon { background: var(--accent); color: var(--accent-ink); }
+  .feed-body { display: grid; gap: 2px; min-width: 0; }
+  .feed-top { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+  .feed-top strong { font-weight: 600; }
+  .feed-top time { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; flex: none; }
+  .feed-text { color: var(--muted); font-size: 15px; line-height: 1.45; }
+  .hero-visual figcaption { margin-top: 14px; font-size: 14px; color: var(--muted); padding-left: 4px; }
+  .hero-visual figcaption span { opacity: .7; }
+  @keyframes feed-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+  @media (min-width: 1000px) {
+    .hero-grid { grid-template-columns: 1.35fr 1fr; gap: 56px; align-items: center; }
+    .feed-item { padding: 18px 20px; }
+  }
 
   .evidence { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--surface); padding: clamp(40px, 6vw, 64px) 0; }
   .evidence-intro { font-family: var(--font-body); font-size: 15px; font-weight: 500; letter-spacing: 0; color: var(--muted); line-height: 1.5; max-width: 46em; }

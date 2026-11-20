@@ -23,11 +23,21 @@ if (calReady) {
       <p class="eyebrow">The Leak Audit · £750</p>
       <h2 id="final-title">{f.title}</h2>
       <p>{f.text}</p>
+      <ol class="next-steps" aria-label={f.nextStepsTitle}>
+        {f.nextSteps.map((step, i) => <li><span>{i + 1}</span>{step}</li>)}
+      </ol>
     </div>
 
     <div class="final-grid">
       <div class="panel form-panel">
-        <h3>{f.formTitle}</h3>
+        <div class="form-head">
+          <h3>{f.formTitle}</h3>
+          <span class="form-time">{f.formTime}</span>
+        </div>
+        <p class="form-context" data-form-context hidden>
+          <span data-context-package hidden>Interested in: <strong data-context-package-name></strong></span>
+          <span data-context-estimate hidden>Your calculator estimate: <strong data-context-estimate-value></strong>/month. We’ll check it properly in the audit.</span>
+        </p>
         <form
           name="enquiry"
           method="POST"
@@ -38,6 +48,8 @@ if (calReady) {
           data-enquiry-form
         >
           <input type="hidden" name="form-name" value="enquiry" />
+          <input type="hidden" name="interested-in" value="" />
+          <input type="hidden" name="calculator-estimate" value="" />
           <p class="hp" aria-hidden="true">
             <label>Leave this empty <input name="company-website" tabindex="-1" autocomplete="off" /></label>
           </p>
@@ -45,37 +57,43 @@ if (calReady) {
           <div class="row-2">
             <div class="field">
               <label for="f-name">Your name</label>
-              <input id="f-name" name="name" type="text" autocomplete="name" required />
+              <input id="f-name" name="name" type="text" autocomplete="name" aria-describedby="f-name-err" data-msg="Please add your name." required />
+              <p class="field-error" id="f-name-err" hidden></p>
             </div>
             <div class="field">
               <label for="f-company">Company</label>
-              <input id="f-company" name="company" type="text" autocomplete="organization" required />
+              <input id="f-company" name="company" type="text" autocomplete="organization" aria-describedby="f-company-err" data-msg="Please add your company name." required />
+              <p class="field-error" id="f-company-err" hidden></p>
             </div>
           </div>
           <div class="row-2">
             <div class="field">
               <label for="f-email">Email</label>
-              <input id="f-email" name="email" type="email" autocomplete="email" required />
+              <input id="f-email" name="email" type="email" autocomplete="email" aria-describedby="f-email-err" data-msg="Please enter a valid email address." required />
+              <p class="field-error" id="f-email-err" hidden></p>
             </div>
             <div class="field">
               <label for="f-phone">Phone</label>
-              <input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required />
+              <input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" aria-describedby="f-phone-err" data-msg="Please add a phone number so we can call you back." required />
+              <p class="field-error" id="f-phone-err" hidden></p>
             </div>
           </div>
           <div class="row-2">
             <div class="field">
               <label for="f-trade">Trade</label>
-              <select id="f-trade" name="trade" required>
+              <select id="f-trade" name="trade" aria-describedby="f-trade-err" data-msg="Please choose your trade." required>
                 <option value="" disabled selected>Choose one</option>
                 {f.trades.map((t) => <option>{t}</option>)}
               </select>
+              <p class="field-error" id="f-trade-err" hidden></p>
             </div>
             <div class="field">
               <label for="f-spend">Monthly lead spend</label>
-              <select id="f-spend" name="monthly-lead-spend" required>
+              <select id="f-spend" name="monthly-lead-spend" aria-describedby="f-spend-err" data-msg="Please choose a range. “Not sure” is fine." required>
                 <option value="" disabled selected>Choose a range</option>
                 {f.leadSpend.map((t) => <option>{t}</option>)}
               </select>
+              <p class="field-error" id="f-spend-err" hidden></p>
             </div>
           </div>
           <div class="field">
@@ -85,17 +103,18 @@ if (calReady) {
 
           <button type="submit" class="btn btn-primary submit">{f.submitLabel}<Icon name="arrow" /></button>
           <p class="form-error" role="alert" hidden></p>
-          <p class="form-small">We only use these details to reply to you. See our <a href="/privacy/">Privacy Policy</a>.</p>
+          <p class="form-small"><Icon name="check" size={16} />{f.reassurance} <a href="/privacy/">Privacy Policy</a>.</p>
         </form>
 
         <div class="thanks" data-thanks hidden tabindex="-1">
           <span class="thanks-icon"><Icon name="check" size={28} /></span>
           <h3>{f.thankYouTitle}</h3>
           <p>{f.thankYouText}</p>
+          <a href="#booking" class="btn btn-ghost thanks-book">Don’t want to wait? Book a 15-minute call<Icon name="arrow" /></a>
         </div>
       </div>
 
-      <div class="panel booking-panel">
+      <div class="panel booking-panel" id="booking">
         <h3>{f.bookingTitle}</h3>
         {calReady ? (
           <>
@@ -136,9 +155,34 @@ if (calReady) {
   if (form && thanks) {
     const err = form.querySelector<HTMLElement>('.form-error')!;
     const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    // Friendly, plain-English validation (the browser's own kicks in if JS is off)
+    form.noValidate = true;
+    const required = [...form.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[required]')];
+    const digits = (v: string) => v.replace(/\D/g, '').length;
+    const isValid = (el: HTMLInputElement | HTMLSelectElement) => {
+      const v = el.value.trim();
+      if (!v) return false;
+      if (el.type === 'email') return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+      if (el.type === 'tel') return digits(v) >= 10;
+      return true;
+    };
+    const showError = (el: HTMLInputElement | HTMLSelectElement, show: boolean) => {
+      const msg = document.getElementById(el.id + '-err')!;
+      msg.textContent = show ? el.dataset.msg || 'Please fill this in.' : '';
+      msg.hidden = !show;
+      el.setAttribute('aria-invalid', String(show));
+    };
+    required.forEach((el) => {
+      el.addEventListener('blur', () => { if (el.value.trim()) showError(el, !isValid(el)); });
+      el.addEventListener('input', () => { if (el.getAttribute('aria-invalid') === 'true' && isValid(el)) showError(el, false); });
+      el.addEventListener('change', () => { if (el.getAttribute('aria-invalid') === 'true' && isValid(el)) showError(el, false); });
+    });
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!form.reportValidity()) return;
+      const bad = required.filter((el) => !isValid(el));
+      required.forEach((el) => showError(el, bad.includes(el)));
+      if (bad.length) { bad[0].focus(); return; }
       err.hidden = true;
       btn.disabled = true;
       const label = btn.innerHTML;
@@ -160,6 +204,27 @@ if (calReady) {
         btn.disabled = false;
         btn.innerHTML = label;
       }
+    });
+  }
+
+  // --- Show what the visitor chose or calculated, so the form feels like the next step ---
+  const ctx = document.querySelector<HTMLElement>('[data-form-context]');
+  if (ctx) {
+    const pkgWrap = ctx.querySelector<HTMLElement>('[data-context-package]')!;
+    const estWrap = ctx.querySelector<HTMLElement>('[data-context-estimate]')!;
+    const pkgField = document.querySelector<HTMLInputElement>('input[name="interested-in"]')!;
+    document.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-package]');
+      if (!btn) return;
+      pkgField.value = btn.dataset.package!;
+      ctx.querySelector('[data-context-package-name]')!.textContent = btn.dataset.package!;
+      pkgWrap.hidden = false; ctx.hidden = false;
+    });
+    document.addEventListener('capsure:estimate', (e) => {
+      const value = (e as CustomEvent).detail as string;
+      ctx.querySelector('[data-context-estimate-value]')!.textContent = value;
+      estWrap.hidden = !value;
+      ctx.hidden = estWrap.hidden && pkgWrap.hidden;
     });
   }
 
@@ -238,6 +303,19 @@ if (calReady) {
   .submit { width: 100%; margin-top: 4px; min-height: 56px; font-size: 17px; }
   .submit:disabled { opacity: .7; cursor: progress; }
   .form-error { color: var(--danger); font-size: 15px; }
+  .field-error { color: var(--danger); font-size: 14px; }
+  .field-error[hidden] { display: none; }
+  .field [aria-invalid="true"] { border-color: var(--danger) !important; }
+  .form-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; }
+  .form-head h3 { margin: 0; }
+  .form-time { font-size: 14px; color: var(--muted); }
+  .form-context { display: grid; gap: 4px; margin: -6px 0 20px; padding: 12px 14px; border-radius: 10px; background: var(--accent-soft); border: 1px solid rgba(61,220,151,.3); font-size: 15px; }
+  .form-context[hidden], .form-context [hidden] { display: none; }
+  .form-context strong { color: var(--accent); }
+  .next-steps { list-style: none; margin: 24px 0 0; padding: 0; display: grid; gap: 10px; }
+  .next-steps li { display: flex; align-items: center; gap: 12px; color: var(--text); }
+  .next-steps span { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--accent); color: var(--accent); font-weight: 700; font-size: 14px; }
+  .form-small :global(svg) { display: inline-block; vertical-align: -3px; color: var(--accent); margin-right: 6px; }
   .form-error[hidden] { display: none; }
   .form-small { font-size: 14px; color: var(--muted); }
 
@@ -245,6 +323,7 @@ if (calReady) {
   .thanks[hidden] { display: none; }
   .thanks-icon { display: inline-grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); margin-bottom: 20px; }
   .thanks p { color: var(--muted); margin-top: 10px; }
+  .thanks-book { margin-top: 24px; }
   [data-enquiry-form][hidden] { display: none; }
 
   .cal-frame { min-height: 520px; max-height: 760px; width: 100%; overflow-y: auto; overscroll-behavior: contain; border-radius: 10px; }

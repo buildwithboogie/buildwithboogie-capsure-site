@@ -17,10 +17,12 @@ import { packages as p } from '../content.js';
           <h3>{item.name}</h3>
           <p class="price"><span class="amount">{item.price}</span> <span class="period">{item.period}</span></p>
           <p class="setup">{item.setup}</p>
+          {item.note && <p class="note">{item.note}</p>}
+          {item.bestFor && <p class="best-for">{item.bestFor}</p>}
           <ul class="features">
             {item.features.map((f) => <li><Icon name="check" size={18} />{f}</li>)}
           </ul>
-          <a href="#get-audit" class={`btn ${item.highlight ? 'btn-primary' : 'btn-ghost'} package-cta`}>{item.cta}</a>
+          <a href="#get-audit" data-package={item.name} class={`btn ${item.highlight ? 'btn-primary' : 'btn-ghost'} package-cta`}>{item.cta}</a>
         </li>
       ))}
     </ul>
@@ -49,7 +51,9 @@ import { packages as p } from '../content.js';
   .price { margin-top: 18px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
   .amount { font-family: var(--font-display); font-weight: 800; font-size: 46px; letter-spacing: -0.03em; line-height: 1; }
   .period { color: var(--muted); }
-  .setup { color: var(--muted); font-size: 15px; margin-top: 10px; min-height: 3em; }
+  .setup { color: var(--muted); font-size: 15px; margin-top: 10px; }
+  .note { display: inline-block; margin-top: 10px; padding: 4px 10px; border-radius: 6px; background: var(--accent-soft); color: var(--accent); font-size: 14px; font-weight: 600; align-self: flex-start; }
+  .best-for { margin-top: 14px; font-size: 15px; color: var(--text); }
   .features { list-style: none; margin: 24px 0 28px; padding: 24px 0 0; border-top: 1px solid var(--line); display: grid; gap: 12px; font-size: 16px; }
   .features li { display: flex; gap: 10px; align-items: flex-start; }
   .features :global(svg) { color: var(--accent); flex: none; margin-top: 3px; }

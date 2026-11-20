@@ -68,6 +68,7 @@ const pct = (id: keyof typeof d) => ((d[id] - c.limits[id].min) / (c.limits[id].
         <p class="calc-result-label">Estimated revenue lost</p>
         <p class="calc-month"><span data-out="month">{gbp(lostMonth)}</span><span class="per">/month</span></p>
         <p class="calc-year"><span data-out="year">{gbp(lostMonth * 12)}</span> a year</p>
+        <p class="calc-week">That’s <span data-out="week">{gbp((lostMonth * 12) / 52)}</span> walking out of the door every week.</p>
         <dl class="calc-breakdown">
           <div><dt>Jobs slipping away each month</dt><dd data-out="jobs">{(d.enquiries * (d.missedRate / 100) * (d.closeRate / 100)).toFixed(1)}</dd></div>
         </dl>
@@ -111,6 +112,7 @@ const pct = (id: keyof typeof d) => ((d[id] - c.limits[id].min) / (c.limits[id].
       const month = jobs * j;
       out('month').textContent = gbp(month);
       out('year').textContent = gbp(month * 12);
+      out('week').textContent = gbp((month * 12) / 52);
       out('jobs').textContent = jobs.toFixed(1);
       out('formula').textContent =
         `${e.toLocaleString('en-GB')} enquiries × ${Math.round(m * 100)}% not followed up × ${Math.round(cr * 100)}% close rate × ${gbp(j)}`;
@@ -124,6 +126,19 @@ const pct = (id: keyof typeof d) => ((d[id] - c.limits[id].min) / (c.limits[id].
         compare.hidden = true;
       }
     };
+
+    // Hand the visitor's own estimate to the enquiry form, once they've used the calculator.
+    let touched = false;
+    const shareWithForm = () => {
+      if (!touched) return;
+      const e = val('enquiries'), j = val('jobValue'), cr = val('closeRate'), m = val('missedRate');
+      const month = e * (m / 100) * (cr / 100) * j;
+      const summary = `${gbp(month)}/month (${e} enquiries, ${gbp(j)} jobs, ${cr}% close, ${m}% not followed up)`;
+      const field = document.querySelector<HTMLInputElement>('input[name="calculator-estimate"]');
+      if (field) field.value = month > 0 ? summary : '';
+      document.dispatchEvent(new CustomEvent('capsure:estimate', { detail: month > 0 ? gbp(month) : '' }));
+    };
+    root.addEventListener('input', () => { touched = true; shareWithForm(); });
 
     for (const k of Object.keys(nums)) {
       nums[k].addEventListener('input', () => {
@@ -203,6 +218,8 @@ const pct = (id: keyof typeof d) => ((d[id] - c.limits[id].min) / (c.limits[id].
   .per { font-size: .36em; letter-spacing: 0; color: var(--muted); margin-left: 6px; }
   .calc-year { font-size: 20px; margin-top: 10px; }
   .calc-year span { font-weight: 600; }
+  .calc-week { color: var(--muted); margin-top: 4px; }
+  .calc-week span { color: var(--text); font-weight: 600; }
   .calc-breakdown { margin: 24px 0 0; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
   .calc-breakdown div { display: flex; justify-content: space-between; gap: 16px; }
   .calc-breakdown dt { color: var(--muted); }

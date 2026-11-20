@@ -1,0 +1,37 @@
+---
+import Icon from './Icon.astro';
+import { fit } from '../content.js';
+---
+<section id="fit" class="section fit-section" aria-labelledby="fit-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Straight talk</p>
+      <h2 id="fit-title">{fit.title}</h2>
+      <p>{fit.intro}</p>
+    </div>
+    <div class="fit-grid">
+      <div class="fit-col is-yes reveal">
+        <h3>{fit.forTitle}</h3>
+        <ul>{fit.for.map((t) => <li><span class="mark"><Icon name="check" size={16} /></span>{t}</li>)}</ul>
+      </div>
+      <div class="fit-col is-no reveal">
+        <h3>{fit.notTitle}</h3>
+        <ul>{fit.not.map((t) => <li><span class="mark" aria-hidden="true">×</span>{t}</li>)}</ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .fit-section { padding-top: 0; }
+  .fit-grid { display: grid; gap: 20px; }
+  .fit-col { padding: 28px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); }
+  .is-yes { border-color: rgba(61, 220, 151, .4); }
+  ul { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 14px; }
+  li { display: flex; gap: 12px; align-items: flex-start; }
+  .mark { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; margin-top: 1px; font-weight: 700; line-height: 1; }
+  .is-yes .mark { background: var(--accent); color: var(--accent-ink); }
+  .is-no .mark { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+  .is-no li { color: var(--muted); }
+  @media (min-width: 820px) { .fit-grid { grid-template-columns: 1fr 1fr; } }
+</style>

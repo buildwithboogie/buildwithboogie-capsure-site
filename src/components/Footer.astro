@@ -11,7 +11,7 @@ const year = new Date().getFullYear();
       <div>
         <Wordmark size={26} />
         <p class="footer-tagline">{site.tagline}</p>
-        <p class="footer-place">Based in {contact.town}, {contact.county}. Working across Surrey, Sussex and the South East.</p>
+        <p class="footer-place">Based in {contact.town}, {contact.county}. Missed-call and enquiry follow-up for home-improvement companies across Surrey, Sussex and the South East, including {contact.areas.slice(0, -1).join(', ')} and {contact.areas.at(-1)}.</p>
       </div>
       <ul class="footer-contact">
         <li>
@@ -41,7 +41,7 @@ const year = new Date().getFullYear();
   .site-footer { border-top: 1px solid var(--line); padding: 56px 0 40px; font-size: 15px; color: var(--muted); }
   .footer-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 32px; }
   .footer-tagline { color: var(--text); font-weight: 500; margin-top: 16px; }
-  .footer-place { margin-top: 6px; max-width: 34em; }
+  .footer-place { margin-top: 6px; max-width: 40em; }
   .footer-contact, .footer-links { list-style: none; margin: 0; padding: 0; }
   .footer-contact { display: grid; gap: 8px; align-content: start; }
   .footer-contact a, .footer-links a { color: var(--text); text-decoration: none; display: inline-block; padding: 4px 0; }

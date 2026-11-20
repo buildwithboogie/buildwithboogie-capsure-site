@@ -43,6 +43,9 @@ export const contact = {
   calLink: '[CAL.COM LINK]',
 
   // Shown in the footer and on the Privacy/Terms pages.
+  // Towns named in the footer (helps local search)
+  areas: ['Crawley', 'Horsham', 'East Grinstead', 'Haywards Heath', 'Brighton', 'Worthing', 'Guildford', 'Woking', 'Reigate', 'Redhill', 'Dorking', 'Epsom'],
+
   legalLine:
     'Capsure is a trading name of [LEGAL ENTITY], company no. [X], registered office [X].',
 };
@@ -63,9 +66,20 @@ export const hero = {
   eyebrow: 'For home-improvement firms in Surrey, Sussex & the South East',
   headline: 'You paid for that lead. Nobody called them back.',
   subhead:
-    'For owners of kitchen, window, roofing, solar, driveway and bathroom companies in Surrey, Sussex and the South East. We answer, chase and book the enquiries you already pay for, and show you the £ recovered every month.',
+    'For owners of kitchen, window, roofing, solar, driveway and bathroom companies in Surrey, Sussex and the South East. Not more leads: more booked jobs from the leads you already pay for.',
   cta: 'Get your Leak Audit — £750',
   secondaryCta: 'Work out what you’re losing',
+  // Three short reassurance points under the buttons
+  trust: ['Fixed prices, all on this page', '£750 audit credited against month one', 'Monthly report in booked jobs and £'],
+  // The illustration beside the headline (an example, not a real client)
+  visual: {
+    caption: 'An evening enquiry, handled',
+    items: [
+      { time: '7:42pm', title: 'Missed call', text: 'New kitchen enquiry. Your team has gone home.', state: 'missed' },
+      { time: '7:43pm', title: 'Text sent in your name', text: '“Sorry we missed you. Pick a time for your design visit here.”', state: 'sent' },
+      { time: '7:51pm', title: 'Design visit booked', text: 'Thursday 10:00. Confirmation and reminder sent.', state: 'booked' },
+    ],
+  },
 };
 
 // ---------------------------------------------------------------------
@@ -101,6 +115,28 @@ export const calculator = {
 };
 
 // ---------------------------------------------------------------------
+// 4b. IS THIS FOR YOU? — being clear who it's NOT for builds trust
+// ---------------------------------------------------------------------
+export const fit = {
+  title: 'Is this for you?',
+  intro: 'We work with a small number of firms at a time, so we’re upfront about who we can help.',
+  forTitle: 'A good fit if',
+  for: [
+    'You sell kitchens, windows, roofing, solar, driveways or bathrooms',
+    'Your average job is £5,000 or more',
+    'You spend £3,000+ a month on leads from Google, Meta, Checkatrade, Bark or similar',
+    'You have 5–40 staff and nobody really owns follow-up',
+  ],
+  notTitle: 'Not a fit if',
+  not: [
+    'You want more leads. We make more of the ones you already get',
+    'You spend less than £3,000 a month on leads',
+    'Your average job is under £5,000',
+    'You’d rather buy software and run it yourself',
+  ],
+};
+
+// ---------------------------------------------------------------------
 // 4. HOW IT WORKS (keep it under 60 words in total)
 // ---------------------------------------------------------------------
 export const howItWorks = {
@@ -131,6 +167,8 @@ export const packages = {
       price: '£750',
       period: 'one-off',
       setup: 'Credited in full against your first retainer month if you start within 14 days.',
+      note: 'Effectively £0 if you go ahead within 14 days.',
+      bestFor: 'Best for: seeing exactly what’s leaking before you spend another penny.',
       highlight: false,
       cta: 'Book the audit',
       features: [
@@ -146,8 +184,9 @@ export const packages = {
       price: '£1,500',
       period: 'per month',
       setup: '+ £500 setup, waived on a 6-month term',
+      bestFor: 'Best for: firms losing enquiries out of hours and quotes that go quiet.',
       highlight: true,
-      badge: 'Most firms start here',
+      badge: 'Recommended',
       cta: 'Start with the audit',
       features: [
         'Call routing and tracked numbers',
@@ -165,6 +204,7 @@ export const packages = {
       price: '£2,950',
       period: 'per month',
       setup: '+ £1,000 setup',
+      bestFor: 'Best for: high-value quotes that need a human chasing them.',
       highlight: false,
       cta: 'Start with the audit',
       features: [
@@ -266,6 +306,18 @@ export const faq = {
       q: 'What if it doesn’t work?',
       a: 'You’re on a 3-month initial term, then rolling 30 days. Every month the report shows booked jobs and £ recovered against what you pay us. If we don’t recover more than we cost, you shouldn’t stay, and you can leave with 30 days’ notice, keeping the software and your data because they’re already in your name.',
     },
+    {
+      q: 'Am I committed to anything after the audit?',
+      a: 'No. The audit is a one-off £750 and the Leakage Report is yours to keep, whether or not you work with us. If you start a retainer within 14 days, the full £750 comes off your first month.',
+    },
+    {
+      q: 'Do I have to change my phone number?',
+      a: 'No. Your number stays on your vans, website and adverts. Calls are routed behind it, and tracked numbers are only added where you want to see which adverts bring in enquiries.',
+    },
+    {
+      q: 'How quickly is it working?',
+      a: 'Once you’ve seen your audit and decided to go ahead, we install everything in 10 days. You don’t need to learn new software. We run it, and you get booked appointments in your calendar.',
+    },
   ],
 };
 
@@ -276,6 +328,14 @@ export const finalCta = {
   title: 'Find out exactly what’s leaking.',
   text: 'The Leak Audit is £750, credited in full against your first month if you start within 14 days. Send the form or book a 15-minute call. You’ll talk to a person, not a sales script.',
   formTitle: 'Request your Leak Audit',
+  formTime: 'Takes about 30 seconds',
+  nextStepsTitle: 'What happens next',
+  nextSteps: [
+    'We reply within one working day',
+    'A 15-minute call to check it’s a fit',
+    'We run your Leak Audit and walk you through the £ figure',
+  ],
+  reassurance: 'No obligation. Your details are never shared or sold.',
   bookingTitle: 'Or book a 15-minute call',
   trades: [
     'Kitchens',

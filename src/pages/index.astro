@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
 import Calculator from '../components/Calculator.astro';
 import HowItWorks from '../components/HowItWorks.astro';
+import Fit from '../components/Fit.astro';
 import Packages from '../components/Packages.astro';
 import Proof from '../components/Proof.astro';
 import Audio from '../components/Audio.astro';
@@ -37,6 +38,7 @@ const business: Record<string, unknown> = {
     { '@type': 'AdministrativeArea', name: 'West Sussex' },
     { '@type': 'AdministrativeArea', name: 'East Sussex' },
     { '@type': 'AdministrativeArea', name: 'South East England' },
+    ...contact.areas.map((name) => ({ '@type': 'City', name })),
   ],
   priceRange: '£750–£2,950',
   makesOffer: packages.items.map((p) => ({
@@ -71,6 +73,7 @@ const faqSchema = {
   <Hero />
   <Calculator />
   <HowItWorks />
+  <Fit />
   <Packages />
   <Proof />
   <Audio />

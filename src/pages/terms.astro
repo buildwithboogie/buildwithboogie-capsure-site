@@ -4,7 +4,7 @@ import { contact, packages } from '../content.js';
 import { ph } from '../lib/format.js';
 const email = ph(contact.email);
 ---
-<Legal title="Terms" description="Website terms of use and a summary of Capsure's service terms." updated="[DATE]">
+<Legal title="Terms" description="Website terms of use and a summary of Capsure's service terms." updated="20 November 2026">
   <h2>About these terms</h2>
   <p>These terms cover your use of this website and summarise how our services are sold. Each client also signs a written service agreement, and if anything here differs from that agreement, the agreement wins.</p>
 
@@ -21,7 +21,7 @@ const email = ph(contact.email);
     {packages.items.map((p) => <li><strong>{p.name}:</strong> {p.price} {p.period}. {p.setup}</li>)}
     <li><strong>Term:</strong> {packages.terms} Either side can end a rolling agreement with 30 days’ written notice.</li>
     <li><strong>Software:</strong> {packages.ownership}</li>
-    <li><strong>Payment:</strong> [Monthly in advance by direct debit / invoice, payable within X days.] Prices [include/exclude] VAT.</li>
+    <li><strong>Payment:</strong> Monthly in advance by invoice, payable within 7 days. Prices [include/exclude] VAT.</li>
     <li><strong>Client responsibilities:</strong> you’re responsible for the accuracy of the information you give us, for your own customer contracts, and for having a lawful basis to contact your enquirers.</li>
     <li><strong>Data protection:</strong> where we handle your customers’ personal data, we do so as your processor under a written data processing agreement.</li>
   </ul>
@@ -30,7 +30,7 @@ const email = ph(contact.email);
   <p>We work hard to recover booked jobs, but results depend on many things outside our control, including your pricing, availability and sales process. We don’t guarantee a specific number of jobs or amount of revenue.</p>
 
   <h2>Liability</h2>
-  <p>Nothing in these terms limits liability that can’t legally be limited, such as for death or personal injury caused by negligence, or fraud. Otherwise, our total liability under any agreement is limited to [the fees you paid us in the 3 months before the claim], and we aren’t liable for indirect losses or loss of profit.</p>
+  <p>Nothing in these terms limits liability that can’t legally be limited, such as for death or personal injury caused by negligence, or fraud. Otherwise, our total liability under any agreement is limited to the fees you paid us in the 3 months before the claim, and we aren’t liable for indirect losses or loss of profit.</p>
 
   <h2>Law</h2>
   <p>These terms are governed by the law of England and Wales, and the courts of England and Wales have exclusive jurisdiction.</p>
