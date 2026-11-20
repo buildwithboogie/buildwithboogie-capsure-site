@@ -28,7 +28,7 @@ Anything in `[SQUARE BRACKETS]` is a placeholder. On the page it's **highlighted
 ## Putting it live on Netlify (one-time)
 
 1. Log in at netlify.com, then **Add new site → Import an existing project → GitHub**, and pick this repository.
-2. Set **Base directory** to `capsure`. Netlify reads the rest from `netlify.toml`.
+2. Leave the build settings as they are. Netlify reads them from `netlify.toml`.
 3. Click **Deploy**. You'll get a free `something.netlify.app` address straight away.
 4. **Domain management → Add a domain** to connect your own domain.
 5. **Forms → Enable form detection**, then redeploy once. Under **Forms → Notifications**, add an email notification so each enquiry is emailed to you.
@@ -36,7 +36,6 @@ Anything in `[SQUARE BRACKETS]` is a placeholder. On the page it's **highlighted
 ## Running it on a computer (optional)
 
 ```
-cd capsure
 npm install
 npm run dev      # opens a live preview at http://localhost:4321
 npm run build    # makes the finished site in the dist/ folder

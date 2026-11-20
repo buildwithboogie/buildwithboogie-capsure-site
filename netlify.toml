@@ -1,5 +1,4 @@
 # Netlify settings for the Capsure site.
-# In Netlify, set "Base directory" to:  capsure
 [build]
   command = "npm run build"
   publish = "dist"
