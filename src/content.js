@@ -45,7 +45,7 @@ export const contact = {
   // Email alerts for new enquiries (free, via Web3Forms).
   // Get a key by entering your email at web3forms.com, then paste it here.
   // Leave empty to switch email alerts off (enquiries still save in Netlify).
-  enquiryEmailKey: '',
+  enquiryEmailKey: 'd23fbf1b-857f-403a-a6d7-172efbf6b2f0',
 
   // Shown in the footer and on the Privacy/Terms pages.
   // Towns named in the footer (helps local search)
