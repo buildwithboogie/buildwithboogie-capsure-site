@@ -1,6 +1,6 @@
 # Capsure website
 
-Live site: hosted on Cloudflare Pages (every change pushed to the `main` branch goes live automatically in about a minute)
+Live site: https://capsure.wandeiyanda1.workers.dev, hosted on Cloudflare (every change pushed to the `main` branch goes live automatically in about a minute)
 
 A one-page marketing site for Capsure, plus Privacy and Terms pages.
 Built with Astro, which turns these files into a plain, fast website. It's hosted free on Cloudflare Pages.

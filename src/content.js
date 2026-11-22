@@ -19,7 +19,7 @@ export const site = {
 
   // Your web address. Leave empty and the host fills it in automatically
   // (it uses your custom domain once you've connected one).
-  url: '',
+  url: 'https://capsure.wandeiyanda1.workers.dev',
 
   // Search engine title (keep under ~60 characters) and description (~155).
   seoTitle: 'Missed Enquiries Costing You Jobs? | Capsure, Surrey & Sussex',

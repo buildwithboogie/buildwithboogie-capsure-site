@@ -1,0 +1,10 @@
+// Cloudflare settings: serve the built site from ./dist and use our
+// branded 404 page for unknown addresses.
+{
+  "name": "capsure",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  }
+}
