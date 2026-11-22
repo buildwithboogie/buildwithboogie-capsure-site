@@ -191,16 +191,16 @@ if (calReady) {
         ['Interested in', data['interested-in']], ['Calculator estimate', data['calculator-estimate']],
         ['What happens after 6pm', data['after-6pm']],
       ].filter(([, v]) => v);
+      // Sent as a standard form post (no JSON), so browsers don't need an extra security check first.
+      const body = new FormData(form);
+      body.delete('redirect');
+      body.set('subject', `New Leak Audit enquiry: ${data.company || data.name}`);
+      body.set('replyto', data.email);
+      body.set('message', lines.map(([k, v]) => `${k}: ${v}`).join('\n'));
       const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          ...data,
-          subject: `New Leak Audit enquiry: ${data.company || data.name}`,
-          replyto: data.email,
-          message: lines.map(([k, v]) => `${k}: ${v}`).join('\n'),
-          redirect: undefined,
-        }),
+        headers: { Accept: 'application/json' },
+        body,
       });
       const json = await res.json().catch(() => ({}));
       return res.ok && json.success !== false;
