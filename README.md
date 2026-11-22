@@ -1,9 +1,9 @@
 # Capsure website
 
-Live site: https://capsure.netlify.app (every change pushed to the `main` branch goes live automatically in about a minute)
+Live site: hosted on Cloudflare Pages (every change pushed to the `main` branch goes live automatically in about a minute)
 
 A one-page marketing site for Capsure, plus Privacy and Terms pages.
-Built with Astro, which turns these files into a plain, fast website. It's hosted free on Netlify.
+Built with Astro, which turns these files into a plain, fast website. It's hosted free on Cloudflare Pages.
 
 ## The one file you edit
 
@@ -24,16 +24,14 @@ Anything in `[SQUARE BRACKETS]` is a placeholder. On the page it's **highlighted
 
 - **Booking calendar:** appears as soon as `calLink` in `content.js` is a real Cal.com link.
 - **Analytics + cookie banner:** appear as soon as `plausibleDomain` in `content.js` is filled in. Analytics only loads after a visitor clicks "Accept".
-- **Web address:** Netlify fills it in for search engines and the sitemap, and uses your own domain once it's connected.
-- **Enquiry form:** Netlify detects it on the first deploy. Submissions appear in Netlify under *Forms*.
+- **Web address:** set `url` in `content.js` to your live address (e.g. your own domain) so search engines and the sitemap use it.
+- **Enquiry form:** each enquiry is emailed to you by Web3Forms (free, 250 a month), using the key in `content.js`.
 
-## Putting it live on Netlify (one-time)
+## Hosting (Cloudflare Pages)
 
-1. Log in at netlify.com, then **Add new site → Import an existing project → GitHub**, and pick this repository.
-2. Leave the build settings as they are. Netlify reads them from `netlify.toml`.
-3. Click **Deploy**. You'll get a free `something.netlify.app` address straight away.
-4. **Domain management → Add a domain** to connect your own domain.
-5. **Forms → Enable form detection**, then redeploy once. Under **Forms → Notifications**, add an email notification so each enquiry is emailed to you.
+The site is connected to this GitHub repository in Cloudflare (*Workers & Pages*).
+Build command `npm run build`, output folder `dist`. Every push to `main` goes live.
+Security headers live in `public/_headers`.
 
 ## Running it on a computer (optional)
 

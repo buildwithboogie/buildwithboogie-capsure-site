@@ -1,10 +1,12 @@
 ---
-// Final call to action: enquiry form (Netlify Forms) + Cal.com booking.
+// Final call to action: enquiry form (sent by email via Web3Forms) + Cal.com booking.
 import Icon from './Icon.astro';
 import { finalCta as f, contact } from '../content.js';
 import { ph, isSet, telHref } from '../lib/format.js';
 
 const calReady = isSet(contact.calLink);
+// Where people land if they send the form with JavaScript switched off.
+const thanksUrl = new URL('/thanks/', Astro.site).href;
 let calPath = '';
 let calOrigin = 'https://app.cal.com';
 if (calReady) {
@@ -41,18 +43,18 @@ if (calReady) {
         <form
           name="enquiry"
           method="POST"
-          action="/thanks/"
-          data-netlify="true"
-          netlify-honeypot="company-website"
+          action="https://api.web3forms.com/submit"
           class="enquiry-form"
           data-enquiry-form
-          data-email-key={contact.enquiryEmailKey || undefined}
         >
-          <input type="hidden" name="form-name" value="enquiry" />
+          <input type="hidden" name="access_key" value={contact.enquiryEmailKey} />
+          <input type="hidden" name="subject" value="New Leak Audit enquiry from the Capsure website" />
+          <input type="hidden" name="from_name" value="Capsure website" />
+          <input type="hidden" name="redirect" value={thanksUrl} />
           <input type="hidden" name="interested-in" value="" />
           <input type="hidden" name="calculator-estimate" value="" />
           <p class="hp" aria-hidden="true">
-            <label>Leave this empty <input name="company-website" tabindex="-1" autocomplete="off" /></label>
+            <label>Leave this empty <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" /></label>
           </p>
 
           <div class="row-2">
@@ -150,7 +152,7 @@ if (calReady) {
 </section>
 
 <script>
-  // --- Enquiry form: send to Netlify without leaving the page ---
+  // --- Enquiry form: send by email without leaving the page ---
   const form = document.querySelector<HTMLFormElement>('[data-enquiry-form]');
   const thanks = document.querySelector<HTMLElement>('[data-thanks]');
   if (form && thanks) {
@@ -179,34 +181,29 @@ if (calReady) {
       el.addEventListener('change', () => { if (el.getAttribute('aria-invalid') === 'true' && isValid(el)) showError(el, false); });
     });
 
-    // Email a copy of the enquiry to the owner (free Web3Forms service).
-    // Never blocks the visitor: if it fails, the enquiry is still saved in Netlify.
-    const sendEmailAlert = async () => {
-      const key = form.dataset.emailKey;
-      if (!key) return;
+    // Send the enquiry to your inbox via Web3Forms.
+    const send = async () => {
       const data = Object.fromEntries(new FormData(form) as any) as Record<string, string>;
-      if (data['company-website']) return; // spam trap filled in
+      if (data.botcheck) return true; // spam trap ticked: quietly pretend it worked
       const lines = [
         ['Name', data.name], ['Company', data.company], ['Email', data.email], ['Phone', data.phone],
         ['Trade', data.trade], ['Monthly lead spend', data['monthly-lead-spend']],
         ['Interested in', data['interested-in']], ['Calculator estimate', data['calculator-estimate']],
         ['What happens after 6pm', data['after-6pm']],
       ].filter(([, v]) => v);
-      try {
-        await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({
-            access_key: key,
-            subject: `New Leak Audit enquiry: ${data.company || data.name}`,
-            from_name: 'Capsure website',
-            replyto: data.email,
-            name: data.name,
-            email: data.email,
-            message: lines.map(([k, v]) => `${k}: ${v}`).join('\n'),
-          }),
-        });
-      } catch { /* the enquiry is already saved in Netlify */ }
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          ...data,
+          subject: `New Leak Audit enquiry: ${data.company || data.name}`,
+          replyto: data.email,
+          message: lines.map(([k, v]) => `${k}: ${v}`).join('\n'),
+          redirect: undefined,
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      return res.ok && json.success !== false;
     };
 
     form.addEventListener('submit', async (e) => {
@@ -219,14 +216,7 @@ if (calReady) {
       const label = btn.innerHTML;
       btn.textContent = 'Sending…';
       try {
-        const body = new URLSearchParams(new FormData(form) as any).toString();
-        const res = await fetch('/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body,
-        });
-        if (!res.ok) throw new Error(String(res.status));
-        await sendEmailAlert();
+        if (!(await send())) throw new Error('not sent');
         form.hidden = true;
         thanks.hidden = false;
         thanks.focus();
