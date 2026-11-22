@@ -46,6 +46,7 @@ if (calReady) {
           netlify-honeypot="company-website"
           class="enquiry-form"
           data-enquiry-form
+          data-email-key={contact.enquiryEmailKey || undefined}
         >
           <input type="hidden" name="form-name" value="enquiry" />
           <input type="hidden" name="interested-in" value="" />
@@ -178,6 +179,36 @@ if (calReady) {
       el.addEventListener('change', () => { if (el.getAttribute('aria-invalid') === 'true' && isValid(el)) showError(el, false); });
     });
 
+    // Email a copy of the enquiry to the owner (free Web3Forms service).
+    // Never blocks the visitor: if it fails, the enquiry is still saved in Netlify.
+    const sendEmailAlert = async () => {
+      const key = form.dataset.emailKey;
+      if (!key) return;
+      const data = Object.fromEntries(new FormData(form) as any) as Record<string, string>;
+      if (data['company-website']) return; // spam trap filled in
+      const lines = [
+        ['Name', data.name], ['Company', data.company], ['Email', data.email], ['Phone', data.phone],
+        ['Trade', data.trade], ['Monthly lead spend', data['monthly-lead-spend']],
+        ['Interested in', data['interested-in']], ['Calculator estimate', data['calculator-estimate']],
+        ['What happens after 6pm', data['after-6pm']],
+      ].filter(([, v]) => v);
+      try {
+        await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            access_key: key,
+            subject: `New Leak Audit enquiry: ${data.company || data.name}`,
+            from_name: 'Capsure website',
+            replyto: data.email,
+            name: data.name,
+            email: data.email,
+            message: lines.map(([k, v]) => `${k}: ${v}`).join('\n'),
+          }),
+        });
+      } catch { /* the enquiry is already saved in Netlify */ }
+    };
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const bad = required.filter((el) => !isValid(el));
@@ -195,6 +226,7 @@ if (calReady) {
           body,
         });
         if (!res.ok) throw new Error(String(res.status));
+        await sendEmailAlert();
         form.hidden = true;
         thanks.hidden = false;
         thanks.focus();

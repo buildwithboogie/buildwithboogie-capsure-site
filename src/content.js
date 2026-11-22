@@ -42,6 +42,11 @@ export const contact = {
   // box shows where the calendar will appear.
   calLink: '[CAL.COM LINK]',
 
+  // Email alerts for new enquiries (free, via Web3Forms).
+  // Get a key by entering your email at web3forms.com, then paste it here.
+  // Leave empty to switch email alerts off (enquiries still save in Netlify).
+  enquiryEmailKey: '',
+
   // Shown in the footer and on the Privacy/Terms pages.
   // Towns named in the footer (helps local search)
   areas: ['Crawley', 'Horsham', 'East Grinstead', 'Haywards Heath', 'Brighton', 'Worthing', 'Guildford', 'Woking', 'Reigate', 'Redhill', 'Dorking', 'Epsom'],
